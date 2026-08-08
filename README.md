@@ -1,115 +1,223 @@
-# Draco Transcoder for Windows
+# Draco Transcoder Windows Build
 
-A step-by-step guide for building the Windows `draco_transcoder.exe` from Google's official Draco source.
+A Windows x64 build of Google's Draco `draco_transcoder`, built from the official Draco 1.5.7 source using CMake and Visual Studio 2022.
 
-This repository does not contain or redistribute the Google Draco source code.
+This repository provides the build guide and a pre-built Windows executable through GitHub Releases.
 
-## About
+## What is Draco?
 
-Google Draco is an open-source C++ library and compression framework for 3D geometric data.
+[Google Draco](https://github.com/google/draco) is an open-source C++ library and compression framework for 3D geometric data.
 
-The official Draco repository provides a `draco_transcoder` tool for transcoding glTF and GLB assets with Draco compression.
+Draco provides compression and decompression capabilities for 3D geometry and can be used with glTF and GLB workflows.
 
-This guide explains how to build the Windows executable using:
+The official Draco project includes a `draco_transcoder` tool for glTF/GLB transcoding and Draco compression.
 
-* Google Draco 1.5.7
-* CMake
-* Visual Studio 2022
-* MSVC C++ compiler
-* Windows SDK
+## About This Repository
 
-## Build Environment
-
-* Operating System: Windows
-* Architecture: x64
-* Visual Studio: 2022
-* CMake: Installed and available in PATH
-* Workload: Desktop development with C++
-* Compiler: MSVC
-* Draco Version: 1.5.7
-
-## Source Repository
-
-The Draco source code is maintained by Google:
-
-https://github.com/google/draco
-
-This repository only provides the build guide and Windows build artifacts. The Draco source code is not copied into this repository.
-
-## Build Overview
-
-Clone the official Draco repository with its submodules:
-
-```bash
-git clone --recursive --branch 1.5.7 https://github.com/google/draco.git
-cd draco
-```
-
-Create a build directory:
-
-```bash
-mkdir build
-cd build
-```
-
-Configure the project using CMake with Draco transcoder support enabled:
-
-```bash
-cmake .. -DDRACO_TRANSCODER_SUPPORTED=ON
-```
-
-Build the project using Visual Studio:
-
-```bash
-cmake --build . --config Release
-```
-
-The resulting executable will be generated as:
+The purpose of this repository is to document how I built the Windows version of:
 
 ```text
 draco_transcoder.exe
 ```
 
-The exact output location can depend on the Visual Studio/CMake generator configuration.
+from the official Google Draco 1.5.7 source.
 
-## What is draco_transcoder.exe?
+The Google Draco source code is not copied into this repository.
 
-The executable can be used as part of a GLB/glTF processing pipeline to apply Draco compression to mesh geometry.
+This repository provides:
 
-For example, it can be integrated into a desktop application or add-in after the normal GLB export process.
+* Windows build instructions
+* CMake configuration
+* Visual Studio build information
+* A pre-built Windows x64 executable
+* Release package containing the executable and applicable Draco license
 
-## Runtime Handling
+## Build Environment
 
-In our application, Draco compression is treated as an optional post-processing step.
+The build was performed on Windows using:
 
-If:
+| Component            | Version / Configuration     |
+| -------------------- | --------------------------- |
+| Draco                | 1.5.7                       |
+| Programming Language | C++                         |
+| Build System         | CMake                       |
+| IDE                  | Visual Studio 2022          |
+| Compiler             | Microsoft Visual C++ (MSVC) |
+| Platform             | Windows x64                 |
+| Transcoder           | `draco_transcoder`          |
 
-* `draco_transcoder.exe` is missing
-* the executable fails
-* the process exceeds the configured timeout
+## Requirements
 
-the original GLB is retained and the export process can continue with a warning.
+Before building Draco on Windows, install:
 
-## Release
+### Visual Studio 2022
 
-Pre-built Windows binaries are provided through the GitHub Releases section.
+Install Visual Studio 2022 with:
 
-Download the latest Windows x64 release:
+* Desktop development with C++
+* MSVC C++ compiler
+* Windows SDK
 
-[GitHub Releases](../../releases)
+### CMake
 
-## License and Attribution
+Install CMake and make sure it is available from the command line.
 
-Draco is an open-source project maintained by Google.
+Verify:
 
-Please refer to the official Draco repository for the applicable license and third-party notices:
+```powershell
+cmake --version
+```
+
+### Git
+
+Git is required to download the Draco source together with its submodules.
+
+Verify:
+
+```powershell
+git --version
+```
+
+## Download Draco 1.5.7
+
+Clone the official Draco repository using the 1.5.7 tag and include its submodules:
+
+```powershell
+git clone --recursive --branch 1.5.7 https://github.com/google/draco.git
+```
+
+Move into the source directory:
+
+```powershell
+cd draco
+```
+
+The `--recursive` option downloads the required Git submodules.
+
+## Configure the Build
+
+Create a build directory:
+
+```powershell
+mkdir build
+cd build
+```
+
+Configure Draco using CMake:
+
+```powershell
+cmake .. -DDRACO_TRANSCODER_SUPPORTED=ON
+```
+
+The important configuration option is:
+
+```text
+DRACO_TRANSCODER_SUPPORTED=ON
+```
+
+This enables the Draco transcoder.
+
+## Build the Release Version
+
+Build the Release configuration:
+
+```powershell
+cmake --build . --config Release
+```
+
+After a successful build, the Windows executable is generated in the Release output directory:
+
+```text
+draco_transcoder.exe
+```
+
+## Verify the Executable
+
+Run:
+
+```powershell
+.\draco_transcoder.exe --help
+```
+
+The command should display the available transcoder options.
+
+## Pre-built Windows Release
+
+A pre-built Windows x64 version is available through GitHub Releases.
+
+[Download the latest Windows release](https://github.com/dhruvaura/draco-transcoder-windows/releases)
+
+The release package contains:
+
+```text
+draco-transcoder-win64-v1.5.7.zip
+|
++-- draco_transcoder.exe
++-- LICENSE
+```
+
+The `draco.lib` file generated during the build is not included because it is not required to run the standalone transcoder executable.
+
+## Example Workflow
+
+A typical workflow can be:
+
+```text
+3D Model
+   |
+   v
+GLB / glTF
+   |
+   v
+draco_transcoder.exe
+   |
+   v
+Draco-compressed GLB
+   |
+   v
+Web / Unity / Unreal / AR / VR / Real-time 3D
+```
+
+Draco can be used as part of a GLB/glTF processing pipeline to reduce mesh geometry size.
+
+## Why Draco Compression?
+
+3D models can contain a significant amount of mesh geometry data.
+
+Draco compression can help reduce the size of mesh geometry and can be useful for applications involving:
+
+* 3D web viewers
+* AR applications
+* VR applications
+* Real-time 3D applications
+* Digital twins
+* glTF / GLB pipelines
+* Interactive 3D experiences
+
+The compression result depends on the input model and transcoding configuration.
+
+## Source
+
+This build is based on the official Google Draco 1.5.7 source:
 
 https://github.com/google/draco
 
-The compiled binaries distributed through this repository were built from the official Draco 1.5.7 source.
+Please refer to the official project for the original source code, documentation, license information, and project development.
+
+## License
+
+The Draco project is licensed under the terms provided by the official Draco repository.
+
+The applicable Draco `LICENSE` file is included with the distributed Windows build.
+
+This repository does not modify or replace the original Draco license.
 
 ## Disclaimer
 
-This repository is an independent build guide and distribution repository.
+This is an independent Windows build of the Google Draco project.
 
-It is not an official Google repository.
+This repository is not an official Google repository and is not affiliated with Google.
+
+The Draco source code remains available from the official project:
+
+https://github.com/google/draco
